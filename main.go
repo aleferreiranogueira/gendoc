@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -22,8 +23,10 @@ func main() {
 		Version: "v0.1",
 		Usage:   "Generate fake documents for development purposes",
 		Action: func(c *cli.Context) error {
+
 			doc := document.CPF{}
-			doc.Generate()
+			fmt.Printf("There you go, lad: \n %s \n", doc.Generate())
+
 			return nil
 		},
 	}
