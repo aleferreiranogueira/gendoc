@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
+	"github.com/aleferreiranogueira/gendoc/document"
 	"github.com/urfave/cli"
 )
 
@@ -22,7 +22,8 @@ func main() {
 		Version: "v0.1",
 		Usage:   "Generate fake documents for development purposes",
 		Action: func(c *cli.Context) error {
-			fmt.Println(c.String("doc"))
+			doc := document.CPF{}
+			doc.Generate()
 			return nil
 		},
 	}
