@@ -1,21 +1,61 @@
+//Package document provides the document Types and a quick New for Documentation instances
 package document
 
 import (
+	"errors"
+	"fmt"
 	"math/rand"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
 )
 
-type Document interface {
-	generate() Document
-	valid() bool
+//DocTypes Holds a map of string values for each Document type for easier usage use the method New(string docType) to get a instance of the specified document
+type DocTypes map[string]reflect.Type
+
+//New receives the document string and resolve it's instance based on the DocTypes map
+func (register DocTypes) New(name string) (interface{}, error) {
+
+	fmt.Println(register[name])
+	if typ, ok := register[name]; ok {
+		return reflect.New(typ).Elem().Interface().(Document).Generate(), nil
+	}
+
+	return nil, errors.New("Could not instance doc with provided type")
 }
 
-type CPF struct{}
+//Set register a string to the Type of i
+func (register DocTypes) Set(name string, i interface{}) {
+	register[name] = reflect.TypeOf(i)
+}
 
-func (d CPF) Generate() string {
+// Document provides methods for generating a fake document
+type Document interface {
+	Generate() Document
+}
+
+// BrazilContext refers to documents that are valid in Brazil
+const BrazilContext = "brazil"
+
+// Cpf provides a brazilian Fiscal Id document
+type Cpf struct {
+	ID      string
+	Context string
+}
+
+//Generate creates a fake document
+func (d Cpf) Generate() Document {
+	doc := Cpf{}
+	doc.Context = BrazilContext
+	doc.ID = doc.makeID()
+	return doc
+}
+
+// Based on the CPF algorithm will generate a random valid CPF
+func (d Cpf) makeID() string {
 	base := seedBase()
+
 	// First digit
 	weight := calculateWeight(base)
 	base = append(base, calculateVerifierDigit(weight))
@@ -35,6 +75,7 @@ func (d CPF) Generate() string {
 	return strings.Join(digits, "")
 }
 
+// Provides a random 9 length integer to serve as the base for the document
 func seedBase() []int {
 	var base []int
 
@@ -47,6 +88,8 @@ func seedBase() []int {
 	return base
 }
 
+// Will sum each digit multiplied by the length (first digit has the 9 multipliyer, second has 10, etc)
+// the sum represent the weight of the verifier digit (last 2 digits)
 func calculateWeight(identifer []int) int {
 	var sum int
 
@@ -57,6 +100,7 @@ func calculateWeight(identifer []int) int {
 	return sum
 }
 
+// Based on the sum of the weight, returns the verifier digit
 func calculateVerifierDigit(weight int) int {
 	rem := weight % 11
 
