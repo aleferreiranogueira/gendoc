@@ -3,7 +3,6 @@ package document
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"reflect"
 	"strconv"
@@ -11,13 +10,12 @@ import (
 	"time"
 )
 
-//DocTypes Holds a map of string values for each Document type for easier usage use the method New(string docType) to get a instance of the specified document
+// DocTypes Holds a map of string values for each Document type for easier usage.
+// Use the method New(docType string) to get a fake document
 type DocTypes map[string]reflect.Type
 
 //New receives the document string and resolve it's instance based on the DocTypes map
 func (register DocTypes) New(name string) (interface{}, error) {
-
-	fmt.Println(register[name])
 	if typ, ok := register[name]; ok {
 		return reflect.New(typ).Elem().Interface().(Document).Generate(), nil
 	}
