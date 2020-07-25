@@ -6,8 +6,8 @@ import (
 )
 
 func TestShouldGenerateCpf(t *testing.T) {
-	doc := new(Cpf)
-	doc.Generate()
+	cpf := Cpf{}
+	doc := cpf.Generate().(Cpf)
 	fmt.Println(doc)
 	if doc.Context != BrazilContext {
 		t.Errorf("Invalid context for CPF")

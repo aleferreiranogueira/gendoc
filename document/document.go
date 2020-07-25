@@ -43,7 +43,7 @@ type Cpf struct {
 }
 
 //Generate creates a fake document
-func (d *Cpf) Generate() Document {
+func (d Cpf) Generate() Document {
 	d.Context = BrazilContext
 	d.ID = d.makeID(time.Now().UnixNano())
 	return d
