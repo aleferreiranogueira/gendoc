@@ -43,26 +43,25 @@ type Cpf struct {
 }
 
 //Generate creates a fake document
-func (d Cpf) Generate() Document {
-	doc := Cpf{}
-	doc.Context = BrazilContext
-	doc.ID = doc.makeID()
-	return doc
+func (d *Cpf) Generate() Document {
+	d.Context = BrazilContext
+	d.ID = d.makeID(time.Now().UnixNano())
+	return d
 }
 
 // Based on the CPF algorithm will generate a random valid CPF
-func (d Cpf) makeID() string {
-	base := seedBase()
+func (d Cpf) makeID(seed int64) string {
+	base := d.randomBase(seed)
 
 	// First digit
-	weight := calculateWeight(base)
-	base = append(base, calculateVerifierDigit(weight))
+	weight := d.calculateWeight(base)
+	base = append(base, d.calculateVerifierDigit(weight))
 
 	//Second Digit
-	weight = calculateWeight(base)
+	weight = d.calculateWeight(base)
 
 	// Whole document
-	identifier := append(base, calculateVerifierDigit(weight))
+	identifier := append(base, d.calculateVerifierDigit(weight))
 
 	var digits []string
 
@@ -74,10 +73,10 @@ func (d Cpf) makeID() string {
 }
 
 // Provides a random 9 length integer to serve as the base for the document
-func seedBase() []int {
+func (d Cpf) randomBase(seed int64) []int {
 	var base []int
 
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(seed)
 
 	for i := 0; i < 9; i++ {
 		base = append(base, rand.Intn(9))
@@ -88,7 +87,7 @@ func seedBase() []int {
 
 // Will sum each digit multiplied by the length (first digit has the 9 multipliyer, second has 10, etc)
 // the sum represent the weight of the verifier digit (last 2 digits)
-func calculateWeight(identifer []int) int {
+func (d Cpf) calculateWeight(identifer []int) int {
 	var sum int
 
 	for key, digit := range identifer {
@@ -99,7 +98,7 @@ func calculateWeight(identifer []int) int {
 }
 
 // Based on the sum of the weight, returns the verifier digit
-func calculateVerifierDigit(weight int) int {
+func (d Cpf) calculateVerifierDigit(weight int) int {
 	rem := weight % 11
 
 	if rem < 2 {

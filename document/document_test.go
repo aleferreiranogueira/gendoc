@@ -5,11 +5,35 @@ import (
 	"testing"
 )
 
+func TestShouldGenerateCpf(t *testing.T) {
+	doc := new(Cpf)
+	doc.Generate()
+	fmt.Println(doc)
+	if doc.Context != BrazilContext {
+		t.Errorf("Invalid context for CPF")
+	}
+
+	if doc.ID == "" {
+		t.Errorf("Invalid ID for CPF")
+	}
+}
+func TestShouldMakeId(t *testing.T) {
+	doc := Cpf{}
+	var seed int64 = 10
+	id := doc.makeID(seed)
+	fmt.Println(id)
+
+	if id != "27783173250" {
+		t.Errorf("Document document number invalid, got %v, wanted 27783173250", len(id))
+	}
+}
+
 func TestSeedBase(t *testing.T) {
-	base := seedBase()
+	doc := new(Cpf)
+	base := doc.randomBase(1)
 
 	if len(base) != 9 {
-		t.Errorf("Base document number inbalid, got %v, wanted 9", len(base))
+		t.Errorf("Base document number invalid, got %v, wanted 9", len(base))
 	}
 }
 
@@ -34,8 +58,10 @@ func TestCalculateFirstWeight(t *testing.T) {
 
 	for _, tt := range tests {
 		testname := fmt.Sprintf("%d,%d", tt.input, tt.want)
+		doc := new(Cpf)
+
 		t.Run(testname, func(t *testing.T) {
-			if result := calculateWeight(tt.input); result != tt.want {
+			if result := doc.calculateWeight(tt.input); result != tt.want {
 				t.Errorf("Total sum for identifier invalid, got %v, wanted %v", result, tt.want)
 			}
 		})
@@ -63,8 +89,10 @@ func TestCalculateSecondWeight(t *testing.T) {
 
 	for _, tt := range tests {
 		testname := fmt.Sprintf("%d,%d", tt.input, tt.want)
+		doc := new(Cpf)
+
 		t.Run(testname, func(t *testing.T) {
-			if result := calculateWeight(tt.input); result != tt.want {
+			if result := doc.calculateWeight(tt.input); result != tt.want {
 				t.Errorf("Total sum for identifier invalid, got %v, wanted %v", result, tt.want)
 			}
 		})
@@ -92,8 +120,10 @@ func TestCalculateFirstVerifierDigit(t *testing.T) {
 
 	for _, tt := range tests {
 		testname := fmt.Sprintf("%d,%d", tt.input, tt.want)
+		doc := new(Cpf)
+
 		t.Run(testname, func(t *testing.T) {
-			if result := calculateVerifierDigit(tt.input); result != tt.want {
+			if result := doc.calculateVerifierDigit(tt.input); result != tt.want {
 				t.Errorf("Verifier digit invalid, got %v, wanted %v", result, tt.want)
 			}
 		})
